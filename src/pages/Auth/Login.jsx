@@ -20,8 +20,10 @@ function Login() {
         password,
       };
       const response = await AuthServices.loginUser(data);
-      console.log(response.data);
+      console.log(response.data.id);
+      const id=response.data.id;
       localStorage.setItem("toDoAppUser", JSON.stringify(response.data));
+      localStorage.setItem("userId",id)
       message.success("Logged in Successfully!");
       navigate("/to-do-list");
       setLoading(false);

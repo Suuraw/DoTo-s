@@ -9,19 +9,20 @@ import AuthServices from '../../services/authServices';
 function Register() {
   const [username,setUsername] = useState("");
   const [password,setPassword] = useState("");
-  const [firstName,setFirstName] = useState("");
-  const [lastName,setLastName] = useState("");
+  const [firstname,setFirstName] = useState("");
+  const [lastname,setLastName] = useState("");
   const [loading,setLoading] = useState(false);
   const navigate = useNavigate();
   const handleSubmit = async ()=>{
     try{
       setLoading(true);
       const data = {
-        firstName,
-        lastName,
+        firstname,
+        lastname,
         username,
         password
       }
+      console.log(data);
       const response = await AuthServices.registerUser(data);
       console.log(response.data);
       setLoading(false);
@@ -41,12 +42,12 @@ function Register() {
           <div className={styles.input__inline__wrapper}>
               <Input 
               placeholder="First Name" 
-              value={firstName} 
+              value={firstname} 
               onChange={(e)=>setFirstName(e.target.value)} />
               <Input 
               placeholder="Last Name" 
               style={{marginLeft:'10px'}}
-              value={lastName} 
+              value={lastname} 
               onChange={(e)=>setLastName(e.target.value)} />
 
           </div>

@@ -13,7 +13,6 @@ import {
   message,
 } from "antd";
 import { getErrorMessage } from "../../util/GetError";
-import { getUserDetails } from "../../util/GetUser";
 import ToDoServices from "../../services/toDoServices";
 import { useNavigate } from "react-router";
 import {
@@ -25,26 +24,20 @@ import {
 
 // Function to format the date
 const getFormattedDate = (dateString = new Date()) => {
-    const parsedDate = new Date(dateString);
-  
-    // Check if parsedDate is a valid date
-    if (isNaN(parsedDate)) {
-      return "Invalid Date"; // Return a fallback in case of invalid date
-    }
-  
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false, // Set to true if you want a 12-hour format
-    };
-  
-    return parsedDate.toLocaleString(undefined, options);
+  const parsedDate = new Date(dateString);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
   };
-  
-  
+  return parsedDate.toLocaleString(undefined, {
+    timeZone: "Asia/Kolkata",
+    ...options,
+  });
+};
 
 function ToDoList() {
   const [title, setTitle] = useState("");
@@ -64,17 +57,18 @@ function ToDoList() {
 
   const getAllToDo = async () => {
     try {
-      let user = getUserDetails();
-      const response = await ToDoServices.getAllToDo(user.userId);
-      setAllToDo(response.data);
+      let userId = localStorage.getItem("userId");
+      const response = await ToDoServices.getAllToDo(userId);
+      console.log(response.data.tasks);
+      setAllToDo(response.data.tasks);
     } catch (err) {
       message.error(getErrorMessage(err));
     }
   };
 
   useEffect(() => {
-    let user = getUserDetails();
-    if (user && user.userId) {
+    let user = localStorage.getItem("userId");
+    if (user) {
       getAllToDo();
     } else {
       navigate("/login");
@@ -94,15 +88,16 @@ function ToDoList() {
   const handleSubmitTask = async () => {
     setLoading(true);
     try {
-      const userId = getUserDetails().userId;
+      // const userId = getUserDetails().userId;
+      console.log(localStorage.getItem("userId"));
       const data = {
         title,
         description,
         iscompleted: false,
-        createdBy: userId,
-        createdAt: getFormattedDate().toString()  // Ensure you're passing a proper date format
-    };
-      console.log(getFormattedDate())
+        createdBy: localStorage.getItem("userId"),
+        createdAt: getFormattedDate().toString(), // Ensure you're passing a proper date format
+      };
+      console.log(getFormattedDate());
       await ToDoServices.createToDo(data);
       setLoading(false);
       message.success("To Do Task Added Successfully!");
@@ -120,13 +115,13 @@ function ToDoList() {
     setCurrentEditItem(item);
     setUpdatedTitle(item.title);
     setUpdatedDescription(item.description);
-    setUpdatedStatus(item.iscompleted); // Ensure this gets the correct value
+    setUpdatedStatus(item.iscompleted);
     setIsEditing(true);
   };
 
   const handleDelete = async (item) => {
     try {
-      await ToDoServices.deleteToDo(item.id);
+      await ToDoServices.deleteToDo(item._id);
       message.success(`${item.title} is Deleted Successfully!`);
       getAllToDo();
     } catch (err) {
@@ -134,9 +129,16 @@ function ToDoList() {
     }
   };
 
-  const handleUpdateStatus = async (id, status) => {
+  const handleUpdateStatus = async (item, status) => {
     try {
-      await ToDoServices.updateToDo(id, { iscompleted: status });
+      const updatedData = {
+        title: item.title,
+        description: item.description,
+        iscompleted: status,
+        createdBy: item.createdBy,
+        createAt: item.createAt,
+      };
+      await ToDoServices.updateToDo(item._id, updatedData);
       message.success("Task Status Updated Successfully!");
       getAllToDo();
     } catch (err) {
@@ -150,10 +152,10 @@ function ToDoList() {
       const data = {
         title: updatedTitle,
         description: updatedDescription,
-        iscompleted: updatedStatus, // Ensure updated status is sent
-        updatedat:getFormattedDate().toString()
+        iscompleted: updatedStatus,
+        updatedat: getFormattedDate().toString(),
       };
-      await ToDoServices.updateToDo(currentEditItem.id, data);
+      await ToDoServices.updateToDo(currentEditItem._id, data);
       message.success(`${currentEditItem.title} Updated Successfully!`);
       setLoading(false);
       setIsEditing(false);
@@ -221,7 +223,7 @@ function ToDoList() {
         <div className={styles.toDoListCardWrapper}>
           {taskListToDisplay.length > 0 ? (
             taskListToDisplay.map((item) => (
-              <div key={item.id} className={styles.toDoCard}>
+              <div key={item._id} className={styles.toDoCard}>
                 <div>
                   <div className={styles.toDoCardHeader}>
                     <h3>{item.title}</h3>
@@ -235,7 +237,7 @@ function ToDoList() {
                 </div>
 
                 <div className={styles.toDoCardFooter}>
-                  <Tag>{getFormattedDate()}</Tag>
+                  <Tag>{item.createdAt}</Tag>
                   <div className={styles.toDoFooterAction}>
                     <Tooltip title="Edit Task?">
                       <EditOutlined
@@ -253,7 +255,7 @@ function ToDoList() {
                     {item.iscompleted ? (
                       <Tooltip title="Mark as Incomplete">
                         <CheckCircleFilled
-                          onClick={() => handleUpdateStatus(item.id, false)}
+                          onClick={() => handleUpdateStatus(item, false)}
                           style={{ color: "green" }}
                           className={styles.actionIcon}
                         />
@@ -261,7 +263,7 @@ function ToDoList() {
                     ) : (
                       <Tooltip title="Mark as Completed">
                         <CheckCircleOutlined
-                          onClick={() => handleUpdateStatus(item.id, true)}
+                          onClick={() => handleUpdateStatus(item, true)}
                           className={styles.actionIcon}
                         />
                       </Tooltip>
