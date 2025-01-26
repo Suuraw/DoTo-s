@@ -1,19 +1,17 @@
-.toDoWrapper{
+.toDoWrapper {
     margin-top: 100px;
     padding: 2rem;
 }
 
-.toDoHeader{
+.toDoHeader {
     display: flex;
-    align-items:center;
+    align-items: center;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin: 0px;
+    margin: 0;
 }
 
-
-
-.toDoCard{
+.toDoCard {
     border: 1px solid whitesmoke;
     box-shadow: 0px 0.233px 8px lightgray;
     padding: 1rem;
@@ -25,54 +23,113 @@
     justify-content: space-between;
 }
 
-.toDoCard p{
+.toDoCard p {
     font-size: 15px;
     color: gray;
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-.toDoListCardWrapper{
+.toDoListCardWrapper {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center; /* Center cards on small screens */
 }
 
-.toDoCardFooter,.toDoCardHeader{
+.toDoCardFooter,
+.toDoCardHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.toDoCardFooter{
-border-top: 1px solid rgb(236, 235, 235);
-padding-top: 10px;
+.toDoCardFooter {
+    border-top: 1px solid rgb(236, 235, 235);
+    padding-top: 10px;
 }
 
-.toDoFooterAction{
+.toDoFooterAction {
     display: flex;
 }
 
-
-
-.actionIcon{
-    font-size: 1.2ren;
+.actionIcon {
+    font-size: 1.2rem;
     margin-left: 5px;
     margin-right: 5px;
     cursor: pointer;
     color: var(--primary);
 }
 
-.actionIcon:hover{
+.actionIcon:hover {
     filter: brightness(50%);
 }
 
-.noTaskWrapper{
+.noTaskWrapper {
     padding: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
-.dueDate{
+
+.dueDate {
     margin-top: 3px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .toDoWrapper {
+        padding: 1rem;
+        margin-top: 50px; /* Adjust margin for smaller screens */
+    }
+
+    .toDoHeader {
+        flex-direction: column; /* Stack header elements vertically */
+        align-items: flex-start;
+    }
+
+    .toDoCard {
+        width: 80%; /* Make cards take up more width */
+        margin: 1rem auto; /* Center cards on mobile */
+    }
+
+    .toDoCard p {
+        font-size: 14px; /* Adjust font size */
+    }
+
+    .toDoCardFooter {
+        flex-direction: column; /* Stack footer actions vertically */
+        align-items: flex-start;
+    }
+
+    .actionIcon {
+        font-size: 1rem; /* Adjust icon size */
+    }
+
+    .noTaskWrapper {
+        padding: 1rem; /* Reduce padding for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .toDoWrapper {
+        padding: 0.5rem; /* Further reduce padding for very small screens */
+    }
+
+    .toDoCard {
+        width: 100%; /* Full width for cards on very small screens */
+    }
+
+    .toDoHeader {
+        align-items: center;
+        text-align: center; /* Center-align text */
+    }
+
+    .toDoCard p {
+        font-size: 13px; /* Slightly smaller font */
+    }
+
+    .actionIcon {
+        font-size: 0.9rem; /* Smaller icons */
+    }
 }

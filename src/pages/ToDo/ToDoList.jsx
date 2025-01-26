@@ -139,7 +139,7 @@ function ToDoList() {
   const handleDelete = async (item) => {
     try {
       await ToDoServices.deleteToDo(item._id);
-      message.success(`${item.title} Task is Deleted Successfully!`);
+      message.success(`${item.title}'s Task is Deleted Successfully!`);
       getAllToDo();
     } catch (err) {
       message.error(getErrorMessage(err));
