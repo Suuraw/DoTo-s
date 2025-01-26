@@ -46,7 +46,7 @@ function Navbar({ active }) {
                 to="/to-do-list"
                 className={active === 'myTask' ? 'activeNav' : ''}
               >
-                My Task
+                Team Tasks
               </Link>
             </li>
           )}

@@ -1,7 +1,9 @@
 import axios from "axios";
 import { getUserDetails } from "../util/GetUser";
 
-const SERVER_URL = import.meta.env.VITE_SERVER_API+"/api/todo"||"http://localhost:3000/api/todo";
+const SERVER_URL = import.meta.env.VITE_SERVER_API+"/api/todo"||"http://localhost:5000/api/todo";
+// const SERVER_URL = "http://localhost:5000/api/todo";
+
 
 const authHeaders = () => {
   let userToken = getUserDetails()?.token;

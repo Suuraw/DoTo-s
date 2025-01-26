@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar";
 import styles from "./ToDoList.module.css";
 import {
   Button,
+  DatePicker,
   Divider,
   Empty,
   Input,
@@ -13,6 +14,7 @@ import {
   message,
 } from "antd";
 import { getErrorMessage } from "../../util/GetError";
+import { CalendarTwoTone } from '@ant-design/icons';
 import ToDoServices from "../../services/toDoServices";
 import { useNavigate } from "react-router";
 import {
@@ -38,6 +40,18 @@ const getFormattedDate = (dateString = new Date()) => {
     ...options,
   });
 };
+const getFormattedDueDate = (dateString) => {
+  const parsedDate = new Date(dateString);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  };
+  return parsedDate.toLocaleString(undefined, {
+    timeZone: "Asia/Kolkata",
+    ...options,
+  });
+};
 
 function ToDoList() {
   const [title, setTitle] = useState("");
@@ -52,6 +66,8 @@ function ToDoList() {
   const [updatedStatus, setUpdatedStatus] = useState(false);
   const [currentTaskType, setCurrentTaskType] = useState("incomplete");
   const [filteredToDo, setFilteredToDo] = useState([]);
+  const [dueDate, setDueDate] = useState(null);
+
 
   const navigate = useNavigate();
 
@@ -96,11 +112,12 @@ function ToDoList() {
         iscompleted: false,
         createdBy: localStorage.getItem("userId"),
         createdAt: getFormattedDate().toString(), // Ensure you're passing a proper date format
+        dueDate:getFormattedDueDate(dueDate)
       };
       console.log(getFormattedDate());
       await ToDoServices.createToDo(data);
       setLoading(false);
-      message.success("To Do Task Added Successfully!");
+      message.success(`To Do Task For ${title} Added Successfully!`);
       setIsAdding(false);
       getAllToDo();
       setTitle("");
@@ -122,7 +139,7 @@ function ToDoList() {
   const handleDelete = async (item) => {
     try {
       await ToDoServices.deleteToDo(item._id);
-      message.success(`${item.title} is Deleted Successfully!`);
+      message.success(`${item.title} Task is Deleted Successfully!`);
       getAllToDo();
     } catch (err) {
       message.error(getErrorMessage(err));
@@ -139,7 +156,7 @@ function ToDoList() {
         createAt: item.createAt,
       };
       await ToDoServices.updateToDo(item._id, updatedData);
-      message.success("Task Status Updated Successfully!");
+      message.success(`${updatedData.title}'s Task Status Updated Successfully!`);
       getAllToDo();
     } catch (err) {
       message.error(getErrorMessage(err));
@@ -154,9 +171,10 @@ function ToDoList() {
         description: updatedDescription,
         iscompleted: updatedStatus,
         updatedat: getFormattedDate().toString(),
+        dueDate:getFormattedDueDate(dueDate)
       };
       await ToDoServices.updateToDo(currentEditItem._id, data);
-      message.success(`${currentEditItem.title} Updated Successfully!`);
+      message.success(`${currentEditItem.title}'s Task Updated Successfully!`);
       setLoading(false);
       setIsEditing(false);
       getAllToDo();
@@ -237,7 +255,7 @@ function ToDoList() {
                 </div>
 
                 <div className={styles.toDoCardFooter}>
-                  <Tag>{item.createdAt}</Tag>
+                  <div className={styles.dueDate}><h5>Due :</h5></div> <Tag>{item.dueDate}</Tag>
                   <div className={styles.toDoFooterAction}>
                     <Tooltip title="Edit Task?">
                       <EditOutlined
@@ -268,7 +286,13 @@ function ToDoList() {
                         />
                       </Tooltip>
                     )}
+                    <Tooltip title={`Created At ${item.createdAt}`}>
+                    <CalendarTwoTone 
+                    className={styles.actionIcon}
+                    />
+                   </Tooltip>
                   </div>
+                
                 </div>
               </div>
             ))
@@ -282,23 +306,29 @@ function ToDoList() {
         {/* Modals for adding and editing tasks */}
         <Modal
           confirmLoading={loading}
-          title="Add New To Do Task"
+          title="Add New To Do For The Team"
           open={isAdding}
           onOk={handleSubmitTask}
           onCancel={() => setIsAdding(false)}
         >
           <Input
             style={{ marginBottom: "1rem" }}
-            placeholder="Title"
+            placeholder="Member Name"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
           <Input.TextArea
             style={{ marginBottom: "1rem" }}
             rows={4}
-            placeholder="Description"
+            placeholder="Task Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+          />
+          <DatePicker
+          style={{ width: "100%", marginBottom: "1rem" }}
+          placeholder="Select Due Date"
+          value={dueDate}
+          onChange={(date) => setDueDate(date)}
           />
         </Modal>
 
@@ -321,6 +351,12 @@ function ToDoList() {
             placeholder="Description"
             value={updatedDescription}
             onChange={(e) => setUpdatedDescription(e.target.value)}
+          />
+          <DatePicker
+          style={{ width: "100%", marginBottom: "1rem" }}
+          placeholder="Select Due Date"
+          value={dueDate}
+          onChange={(date) => setDueDate(date)}
           />
           <Select
             value={updatedStatus}
